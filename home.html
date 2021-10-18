@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        #news{
+            display: flex;
+            flex-direction: column;
+        }
+        #search{
+            width: 40%;
+        }
+        .mdiv{
+            display: grid;
+            grid-template-columns: 30% 70%;
+            margin: auto;
+
+        }
+        .mdiv > div> img{
+            width: 100%;
+            height:65px;
+        }
+        .mDiv{
+            display: grid;
+            grid-template-columns: 33% 33% 33%;
+            cursor: pointer;
+        }
+        img{
+            width: 100%;
+        }
+        #he{
+            width: 20%;
+            margin:auto;
+
+        } 
+        
+        #res{
+            width: 50%;
+            margin-left: 20%;
+        }
+        .imm{
+            width: 95%;
+        }
+        #searchRes{
+            width: 40%;
+            overflow-y: scroll;
+            max-height: 300px;
+            border: 1px solid black;
+            justify-content: left;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <h1 id="he">NewsFeed</h1>
+    <form action="" onsubmit="searchGet(event)">
+        <input type="text" id="search" placeholder="search for your favorite news">
+        <input type="submit">
+    </form>
+    <div id="searchRes">
+    
+    </div>
+    <div id="res">
+
+    </div>
+    <div id="news">
+
+    </div>
+</body>
+</html>
+<script>
+    //c8123969fa8d43b4a582ef3d84e73a78
+async function getDetails(){
+ 
+ try{
+ let res = await fetch(`https://newsapi.org/v2/everything?q=apple&from=2021-10-17&to=2021-10-17&sortBy=popularity&apiKey=c8123969fa8d43b4a582ef3d84e73a78`)//(`https://newsapi.org/v2/everything?q=tesla&from=2021-09-18&sortBy=publishedAt&apiKey=c8123969fa8d43b4a582ef3d84e73a78`)
+ var data = await res.json();
+ console.log("data",data.articles)
+ var articles = data.articles;
+ showDetails(articles)
+ return data;
+}
+catch(err){
+    console.log('err',err);
+}
+}
+
+getDetails();
+var parent = document.getElementById('news');
+function showDetails(news)
+{
+news.forEach((newss)=>{
+let div = document.createElement('div');
+div.setAttribute('class','mDiv')
+div.addEventListener('click',()=>{
+    var n = newss;
+    localStorage.removeItem('fav');
+    if(localStorage.getItem('fav')==undefined)
+    {
+        localStorage.setItem('fav',JSON.stringify(n));
+    }
+    console.log('hereree',n)
+    window.location.href="news.html";
+
+})
+ let div1 = document.createElement('div');
+ let div2 = document.createElement('div');
+ let div3 = document.createElement('div');
+
+ //div.setAttribute('class','content')
+
+let  he1 = document.createElement('h1');
+he1.setAttribute('class','heading')
+he1.textContent = newss.title;
+let author = document.createElement('h6');
+author.textContent = newss.author;
+let desc = document.createElement('p');
+desc.textContent = newss.description;
+div1.append(he1,author);
+div2.append(desc);
+let img = document.createElement('img');
+img.src = newss.urlToImage;
+div3.append(img);
+div.append(div1,div2,div3);
+parent.append(div);
+})
+}
+async function searchGet(e){
+    e.preventDefault();
+    var news_name = document.getElementById("search").value;
+    console.log('news_name',news_name)
+   var res = await fetch(`https://newsapi.org/v2/everything?q=${news_name}&apiKey=c8123969fa8d43b4a582ef3d84e73a78`)
+    var dat =await res.json();
+    console.log(dat)
+    var artic = dat.articles;
+    console.log('dat',dat.articles)
+    appendResults(artic);
+}
+var arr=[];
+console.log('arr',arr)
+var parent1 = document.getElementById('searchRes');
+var results = document.getElementById('res');
+function appendResults(results)
+{
+    parent.innerHTML=null;
+results.forEach((neww)=>{
+    let Mdiv = document.createElement('div');
+    Mdiv.setAttribute('class','mdiv')
+    let divImg = document.createElement('div');
+    let divC = document.createElement('div');
+    let img = document.createElement('img');
+    img.src=neww.urlToImage;
+    let dsc = document.createElement('p');
+    dsc.textContent=neww.title;
+    let date = document.createElement('p')
+    date.textContent=neww.author;
+    let a = document.createElement('h6');
+    a.textContent=neww.publishedAt;
+    divImg.append(img);
+    divC.append(dsc,date,a);
+    Mdiv.append(divImg,divC);
+    parent1.append(Mdiv);
+    arr.push(neww)
+    divC.addEventListener('click',()=>{
+        var Nae = neww.title;
+        console.log('Nae',Nae)
+        displayRes(Nae)
+    })
+})
+}
+var res_parent = document.getElementById('res');
+function displayRes(NaMe){
+    res_parent.innerHTML=null;
+    parent.innerHTML=null;
+    parent1.innerHTML=null;
+
+    arr.forEach((ar)=>{
+        if(ar.title==NaMe)
+        {
+
+    let div = document.createElement('div');
+    let h2 = document.createElement('h1')
+    h2.textContent=ar.title;
+    let au = document.createElement('p');
+    au.textContent=ar.author+"  / "+ar.publishedAt;
+    let img = document.createElement('img');
+    img.setAttribute('class','imm')
+    img.src = ar.urlToImage;
+    let c = document.createElement('h4');
+    c.textContent=ar.content;
+    let d = document.createElement('h4');
+    d.textContent=ar.description;
+    
+    div.append(h2,au,img,c,d);
+    res_parent.append(div);        
+        }
+    })
+    
+    
+}
+</script>

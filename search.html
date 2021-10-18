@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        
+        #searchRes{
+            width: 40%;
+            box-shadow: 1px 1px 2px 0px gray;
+            overflow-y: scroll;
+            max-height: 300px;
+            cursor: pointer;
+            
+        }
+        #search{
+            width: 40%;
+        }
+        .mdiv{
+            display: grid;
+            grid-template-columns: 30% 70%;
+            margin: auto;
+            border: 1px solid black;
+
+        }
+        .mdiv > div> img{
+            width: 100%;
+            height:65px;
+        }
+        #res{
+            width: 50%;
+            margin-left: 20%;
+        }
+        .imm{
+            width: 95%;
+        }
+    </style>
+</head>
+<body>
+    <h1>Search your favourite News</h1>
+    <form action="" onsubmit="searchGet(event)">
+        <input type="text" id="search" placeholder="search for your favorite news">
+        <input type="submit">
+    </form>
+    <div id="searchRes">
+    
+    </div>
+    <div id="res">
+
+    </div>
+</body>
+</html>
+<script>
+    async function searchGet(e){
+    e.preventDefault();
+    var news_name = document.getElementById("search").value;
+    console.log('news_name',news_name)
+   var res = await fetch(`https://newsapi.org/v2/everything?q=${news_name}&apiKey=c8123969fa8d43b4a582ef3d84e73a78`)
+    var dat =await res.json();
+    console.log(dat)
+    var artic = dat.articles;
+    console.log('dat',dat.articles)
+    appendResults(artic);
+}
+var arr=[];
+console.log('arr',arr)
+var parent = document.getElementById('searchRes');
+var results = document.getElementById('res');
+function appendResults(results)
+{
+results.forEach((neww)=>{
+    let Mdiv = document.createElement('div');
+    Mdiv.setAttribute('class','mdiv')
+    let divImg = document.createElement('div');
+    let divC = document.createElement('div');
+    let img = document.createElement('img');
+    img.src=neww.urlToImage;
+    let dsc = document.createElement('p');
+    dsc.textContent=neww.title;
+    let date = document.createElement('p')
+    date.textContent=neww.author;
+    let a = document.createElement('h6');
+    a.textContent=neww.publishedAt;
+    divImg.append(img);
+    divC.append(dsc,date,a);
+    Mdiv.append(divImg,divC);
+    parent.append(Mdiv);
+    arr.push(neww)
+    divC.addEventListener('click',()=>{
+        var Nae = neww.title;
+        console.log('Nae',Nae)
+        displayRes(Nae)
+    })
+})
+}
+var res_parent = document.getElementById('res');
+function displayRes(NaMe){
+    res_parent.innerHTML=null;
+    parent.innerHTML=null;
+    arr.forEach((ar)=>{
+        if(ar.title==NaMe)
+        {
+
+    let div = document.createElement('div');
+    let h2 = document.createElement('h1')
+    h2.textContent=ar.title;
+    let au = document.createElement('p');
+    au.textContent=ar.author+"  / "+ar.publishedAt;
+    let img = document.createElement('img');
+    img.setAttribute('class','imm')
+    img.src = ar.urlToImage;
+    let c = document.createElement('h4');
+    c.textContent=ar.content;
+    let d = document.createElement('h4');
+    d.textContent=ar.description;
+    
+    div.append(h2,au,img,c,d);
+    res_parent.append(div);        
+        }
+    })
+    
+    
+}
+</script>
